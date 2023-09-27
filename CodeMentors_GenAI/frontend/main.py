@@ -1,6 +1,7 @@
 import time
 import requests
 import streamlit as st
+from PIL import Image
 
 st.set_option("deprecation.showfileUploaderEncoding", False)
 
@@ -23,29 +24,48 @@ st.sidebar.markdown(
 
 st.sidebar.write('<p class="sidebar-title">CODE MENTOR</p>', unsafe_allow_html=True)
 
+
 # add language box
 add_languagebox = st.sidebar.selectbox(
-    ":one: Please select the language?",
+    "Please select the language?",
     ("SQL", "Python")
 )
 
 # add document extension box
 add_documnetextebox = st.sidebar.selectbox(
-    ":two: Please select the coding standard document type?",
+    "Please select the coding standard document type?",
     ("text", "excel","pdf","none")
 )
 
-# Add a file uploader widget
-uploaded_standard_file = st.sidebar.file_uploader(":three: Upload the coding standard document :+1:", type=["text", "xlsx", "csv","pdf"])
+#Check the value of documentbox and show the file uploader accordingly
+if add_documnetextebox in "none":
+    st.session_state.disabled = True
+    uploaded_standard_file = st.sidebar.file_uploader("Upload the coding standard document", type=["text", "xlsx", "csv","pdf"],
+                                                     disabled=st.session_state.disabled)
+else:
+    uploaded_standard_file = st.sidebar.file_uploader("Upload the coding standard document", type=["text", "xlsx", "csv","pdf"])
+    
+# Add a Code file uploader widget
+uploaded_code_file = st.sidebar.file_uploader("Upload the respective code file :page_facing_up:", type=["text", "xlsx", "csv","pdf"])
 
-# Add a file uploader widget
-uploaded_code_file = st.sidebar.file_uploader(":four: Upload the respective code file :page_facing_up:", type=["text", "xlsx", "csv","pdf"])
+
+# Add an Image
+image = Image.open('C:\\Users\\azmatul.azam\\Documents\\codementor.jpg')
+st.image(image)
+
+m = st.markdown("""
+<style>
+div.stButton > button:click {
+    background-color: #00ff00;
+    color:#ff0000;
+    }
+</style>""", unsafe_allow_html=True)
 
 #Add the respective buttons
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    button1 = st.button('Code Assessment')
+    button1 = st.button("Code Assessment")
 
 with col2:
     button2 = st.button('Reviewed Code')
@@ -54,7 +74,7 @@ with col3:
     button3 = st.button('Code Optimization')
 
 if button1:
-     st.write("Button1 clicked!")
+     st.markdown(''':rainbow[Button1 clicked!]''')
      content = ('''
      It was the best of times, it was the worst of times, it was
      the age of wisdom, it was the age of foolishness, it was
@@ -65,10 +85,12 @@ if button1:
      st.text_area(content)
         
 if button2:
-     st.write("Button2 clicked!")
+     st.markdown(''':rainbow[Button2 clicked!]''')
+     st.balloons()
         
 if button3:
-     st.write("Button3 clicked!")
+     st.markdown(''':rainbow[Button3 clicked!]''')
+     st.balloons()
 
 
 if st.button("codematurity"):   
