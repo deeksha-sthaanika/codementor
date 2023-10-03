@@ -50,7 +50,9 @@ uploaded_code_file = st.sidebar.file_uploader("Upload the respective code file :
 
 
 # Add an Image
-image = Image.open('C:\\Users\\azmatul.azam\\Documents\\codementor.jpg')
+#image = Image.open('C:\\Users\\azmatul.azam\\Documents\\codementor.jpg')
+
+image = Image.open('.//codementor.jpg')
 st.image(image)
 
 m = st.markdown("""
