@@ -24,66 +24,31 @@ def read_root():
     return {"message": "Welcome from the API"}
 
 @app.post("/{codematurity}")
-async def get_file(style: str, file: UploadFile = File(...)):
-    image = np.array(Image.open(file.file))
-    model = config.STYLES[style]
-    start = time.time()
-    output, resized = inference.inference(model, image)
-    name = f"/storage/{str(uuid.uuid4())}.jpg"
-    print(f"name: {name}")
-    # name = file.file.filename
-    cv2.imwrite(name, output)
-    models = config.STYLES.copy()
-    del models[style]
-    asyncio.create_task(generate_remaining_models(models, image, name))
-    return {"name": name, "time": time.time() - start}
+  #call method pdf/txt etc from utility to read best practice files
+  #call method py/sql from utility to read code file
+  #call prompt with those passing args
+  #call completion and obtain response from this
+  #pass this response to front end and show in text area with download option
 
 
 @app.post("/{correctcodegeneration}")
-async def get_file(style: str, file: UploadFile = File(...)):
-    image = np.array(Image.open(file.file))
-    model = config.STYLES[style]
-    start = time.time()
-    output, resized = inference.inference(model, image)
-    name = f"/storage/{str(uuid.uuid4())}.jpg"
-    print(f"name: {name}")
-    # name = file.file.filename
-    cv2.imwrite(name, output)
-    models = config.STYLES.copy()
-    del models[style]
+async def get_file(style: str, file: UploadFile = File(...)):   
     asyncio.create_task(generate_remaining_models(models, image, name))
     return {"name": name, "time": time.time() - start}
 
 
 @app.post("/{optimizecode}")
-async def get_file(style: str, file: UploadFile = File(...)):
-    image = np.array(Image.open(file.file))
-    model = config.STYLES[style]
-    start = time.time()
-    output, resized = inference.inference(model, image)
-    name = f"/storage/{str(uuid.uuid4())}.jpg"
-    print(f"name: {name}")
-    # name = file.file.filename
-    cv2.imwrite(name, output)
-    models = config.STYLES.copy()
-    del models[style]
+async def get_file(style: str, file: UploadFile = File(...)):   
     asyncio.create_task(generate_files(models, image, name))
     return {"name": name, "time": time.time() - start}
 
 async def generate_files(models, image, name: str):
-    executor = ProcessPoolExecutor()
-    event_loop = asyncio.get_event_loop()
-    await event_loop.run_in_executor(
-        executor, partial(process_files, models, image, name)
-    )
+    print("get files")
+    
 
 
 def process_files(models, image, name: str):
-    for model in models:
-        output, resized = inference.inference(models[model], image)
-        name = name.split(".")[0]
-        name = f"{name.split('_')[0]}_{models[model]}.jpg"
-        cv2.imwrite(name, output)
+    print("process files")
 
 
 if __name__ == "__main__":

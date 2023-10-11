@@ -2,6 +2,9 @@ import streamlit as st
 st.set_page_config(page_title="Code Mentor", page_icon="🌀", layout="wide")
 from typing import Any, Dict
 from PIL import Image
+import os
+import requests
+from fastapi import FastAPI, File, UploadFile
 
 image = Image.open('.//codementor.jpg')
 st.image(image)
@@ -92,20 +95,21 @@ try:
         ("text", "excel","pdf","none")
     )
 
-    #Check the value of documentbox and show the file uploader accordingly
-    if add_documnetextebox in "none":
-        st.session_state.disabled = True
-        uploaded_standard_file = st.sidebar.file_uploader("Upload the coding standard document", type=["text", "xlsx", "csv","pdf"],
-                                                        disabled=st.session_state.disabled)
-    else:
-        uploaded_standard_file = st.sidebar.file_uploader("Upload the coding standard document", type=["text", "xlsx", "csv","pdf"])
         
-    # Add a Code file uploader widget
-    uploaded_code_file = st.sidebar.file_uploader("Upload the respective code file :page_facing_up:", type=["text", "xlsx", "csv","pdf",".py",".sql"])
-    
-    
+    # Add a Code standard file uploader widget
+    if 'file_std' not in st.session_state:
+        uploaded_file = st.sidebar.file_uploader("Upload the coding standard document",key='file_std_key')   
+    else:
+        uploaded_file = st.sidebar.file_uploader("Upload the coding standard document",key='file_std_key')
+    st.session_state.file_std=uploaded_file
 
-    
+    # Add a Code file uploader widget
+    if 'file_code' not in st.session_state:
+        uploaded_file = st.sidebar.file_uploader("Upload the respective code file :page_facing_up:",key='file_code_key')   
+    else:
+        uploaded_file = st.sidebar.file_uploader("Upload the respective code file :page_facing_up:",key='file_code_key')
+    st.session_state.file_code=uploaded_file
+  
     
 except Exception as e:
     st.error(e) 

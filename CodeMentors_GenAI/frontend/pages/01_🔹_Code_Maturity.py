@@ -1,8 +1,13 @@
 import streamlit as st
-import Home
-st.set_page_config(
-    page_title="Code Mentor - Code Maturity", page_icon="🔹", layout="wide"
-)
+# st.set_page_config(
+#     page_title="Code Mentor - Code Maturity", page_icon="🔹", layout="wide"
+# )
+import Home as hm
+import requests
+from fastapi import FastAPI, File, UploadFile
+import os
+
+
 
 
 st.markdown("<h1 style='text-align: center; color: black;padding: 1% 1% 1% 1%;background-color: #a2d5f2;'>Code Maturity</h1>", unsafe_allow_html=True)
@@ -118,41 +123,76 @@ font-weight:bold
 """
 st.markdown(f"<style>{style_table}</style>",unsafe_allow_html=True)
 
+app = FastAPI()
+
+@app.post("/Code_Maturity/")
+async def process_files(file1: UploadFile = File(...), file2: UploadFile = File(...)):
+    # some processing with the files
+    contents1 = await file1.read()
+    contents2 = await file2.read()
+
+    # Send the processed data to some other API or service
+    # For example, you could send it to a Flask app like this:
+    # response = requests.post("http://localhost:5000/process_data", json={"data": [contents1, contents2]})
+    # return response.json()
+    return contents1,contents2
+
+# Streamlit interface
+def save_uploadedfile(uploadedfile):
+    with open(os.path.join(uploadedfile.name),"wb") as f:
+        f.write(uploadedfile.getbuffer())
+
 def main():
+
     try:
-        
-        col1, col2, col3,col4 = st.columns(4)
+        selected_lang=hm.add_languagebox
+        selected_doc_type=hm.add_documnetextebox
 
-        with col1:
-            if add_languagebox != '':
-                st.write(f'👋 Hello {add_languagebox}!')
-            else:
-                st.write('👈  Please choose  **add_languagebox**!')
+        save_uploadedfile(st.session_state.file_std)
+        save_uploadedfile(st.session_state.file_code)
 
-        with col2:
-            if add_documnetextebox != '':
-                st.write(f'{add_documnetextebox} is your favorite **emoji**!')
-            else:
-                st.write('👈 Please choose an **add_documnetextebox**!')
+        col3,col4 = st.columns(2)
 
         with col3:
-            if uploaded_standard_file != '':
-                st.write(f'🍴 **{uploaded_standard_file}** is your favorite **uploaded_standard_file**!')
+            if st.session_state.file_std.name:
+                with open(st.session_state.file_std.name, "r") as f:
+                    with st.expander(f"🔎 View standard file content ({selected_doc_type})"):
+                        content=f.read()
+                        st.code(content)
             else:
                 st.write('👈 Please choose  **uploaded_standard_file**!')
 
         with col4:
-            if uploaded_code_file != '':
-                st.write(f'🍴 **{uploaded_code_file}** is your favorite **uploaded_code_file**!')
+            if st.session_state.file_code.name:
+                with open(st.session_state.file_code.name, "r") as f:
+                    with st.expander(f"🔎 View {selected_lang} code file content"):
+                        content=f.read()
+                        st.code(content,selected_lang)
             else:
                 st.write('👈 Please choose  **uploaded_code_file**!')
-         files = {"file": image.getvalue()} #file details
-        res = requests.post(f"http://localhost:8080/{codematurity}", files=files)
-        img_path = res.json()
-        image = Image.open(img_path.get("name"))
-        st.image(image)        
-        st.write("Generating code maturity...")
-         
+
+        if st.button("Process Files"):
+            #code to send 2 files to api for converion
+            response = requests.post("http://localhost:8080/Code_Maturity", files={"file1": st.session_state.file_std.read(), "file2": st.session_state.file_code.read()})
+            # response = requests.post("http://localhost:8501/Code_Maturity", files={"file1": st.session_state.file_std.read(), "file2": st.session_state.file_code.read()})
+            st.write(response.content)
+            
+            if response.status_code==200:
+                st.title("Converted File")
+                if st.session_state.file_code.name:
+                    with open(st.session_state.file_code.name, "r") as f:
+                        with st.expander(f"🔎 View {selected_lang} code file content as per standards"):
+                            content=f.read()
+                            st.code(content,selected_lang)
+
+
+        # files = {"file": image.getvalue()} #file details
+        # res = requests.post(f"http://localhost:8080/{codematurity}", files=files)
+        # img_path = res.json()
+        # image = Image.open(img_path.get("name"))
+        # st.image(image)        
+        # st.write("Generating code maturity...")
+        
     except AttributeError:
         st.warning("Please login to access this page")
 
