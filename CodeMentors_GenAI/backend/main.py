@@ -32,32 +32,18 @@ def read_root():
 @app.post("/Code_Maturity/")#lang: str,type: str,
 async def create_upload_file(lang: str = Form(...),type: str = Form(...),file_std: UploadFile = File(...),file_code: UploadFile = File(...)):#files: UploadFile = File(...)
     contents_code=await file_code.read()
-    
+    file_std1=io.BytesIO(await file_std.read())
+
     if type=='text':
-        contents_std=await fn.readTxt(file_std)
-        # contents_std= await file_std.read()
+        contents_std=fn.readTxt(file_std1)
     elif type=='pdf':
-        file_std1=io.BytesIO(await file_std.read())
         contents_std=fn.readPdf(file_std1)
-        # pdfreader = await PdfReader(file_std)
-        # raw_text = ''
-        # for i, page in enumerate(pdfreader.pages):
-        #     content = page.extract_text()
-        #     if content:
-        #         raw_text += content
-        # print(raw_text)
-        # contents_std=raw_text
     elif type=='docx':
-        file_std1=io.BytesIO(await file_std.read())
         contents_std=fn.readDoc(file_std1)
     elif type=='csv':
-        file_std1=await file_std.read()
-        contents_std=fn.readCsv(file_std1.decode())
-        # df = pd.read_csv(file_std)
-        # raw_text = '. '.join(list(df['standard']))
-        # contents_std= raw_text
+        contents_std=fn.readCsv(file_std1)
     elif type=='excel':
-        contents_std=await fn.readExcel(file_std)
+        contents_std=fn.readExcel(file_std1)
     
     ready_prompt = prompt.suggestChange(lang, contents_std, contents_code)
     completition = getResponseLlm(ready_prompt)
