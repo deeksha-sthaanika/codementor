@@ -6,6 +6,8 @@ import Home as hm
 import requests
 from fastapi import FastAPI, File, UploadFile
 import os
+import io
+import PyPDF2
 
 
 
@@ -123,20 +125,6 @@ font-weight:bold
 """
 st.markdown(f"<style>{style_table}</style>",unsafe_allow_html=True)
 
-app = FastAPI()
-
-@app.post("/Code_Maturity/")
-async def process_files(file1: UploadFile = File(...), file2: UploadFile = File(...)):
-    # some processing with the files
-    contents1 = await file1.read()
-    contents2 = await file2.read()
-
-    # Send the processed data to some other API or service
-    # For example, you could send it to a Flask app like this:
-    # response = requests.post("http://localhost:5000/process_data", json={"data": [contents1, contents2]})
-    # return response.json()
-    return contents1,contents2
-
 # Streamlit interface
 def save_uploadedfile(uploadedfile):
     with open(os.path.join(uploadedfile.name),"wb") as f:
@@ -145,8 +133,8 @@ def save_uploadedfile(uploadedfile):
 def main():
 
     try:
-        selected_lang=hm.add_languagebox
-        selected_doc_type=hm.add_documnetextebox
+        selected_lang=st.session_state.code_lang
+        selected_doc_type=st.session_state.doc_type
 
         save_uploadedfile(st.session_state.file_std)
         save_uploadedfile(st.session_state.file_code)
@@ -155,46 +143,50 @@ def main():
 
         with col3:
             if st.session_state.file_std.name:
-                with open(st.session_state.file_std.name, "r") as f:
-                    with st.expander(f"🔎 View standard file content ({selected_doc_type})"):
-                        content=f.read()
-                        st.code(content)
+                # with open(st.session_state.file_std.name, "r") as f:
+                with st.expander(f"🔎 View standard file content ({selected_doc_type})"):
+                #         content=f.read()
+                #         st.code(content)
+                    st.code(st.session_state.file_std.getvalue())
+                    # st.write(PyPDF2.PdfFileReader(io.BytesIO(st.session_state.file_std)))
             else:
                 st.write('👈 Please choose  **uploaded_standard_file**!')
 
         with col4:
             if st.session_state.file_code.name:
-                with open(st.session_state.file_code.name, "r") as f:
-                    with st.expander(f"🔎 View {selected_lang} code file content"):
-                        content=f.read()
-                        st.code(content,selected_lang)
+                # with open(st.session_state.file_code.name, "r") as f:
+                with st.expander(f"🔎 View {selected_lang} code file content"):
+                        # content=f.read()
+                        # st.code(content,selected_lang)
+                    st.code(st.session_state.file_code.getvalue(),selected_lang)
             else:
                 st.write('👈 Please choose  **uploaded_code_file**!')
 
+        files = {
+                 'file_std': st.session_state.file_std,
+                 'file_code': st.session_state.file_code
+                 }
+
+        data = {'lang':selected_lang ,'type':selected_doc_type}
+
         if st.button("Process Files"):
-            #code to send 2 files to api for converion
-            response = requests.post("http://localhost:8080/Code_Maturity", files={"file1": st.session_state.file_std.read(), "file2": st.session_state.file_code.read()})
-            # response = requests.post("http://localhost:8501/Code_Maturity", files={"file1": st.session_state.file_std.read(), "file2": st.session_state.file_code.read()})
-            st.write(response.content)
+            st.write(files)
+            st.write(data)
+            response = requests.post("http://127.0.0.1:8000/Code_Maturity/", files=files,data=data)
+            st.write(response.json())
             
             if response.status_code==200:
-                st.title("Converted File")
+                st.title("Suggested Changes")
                 if st.session_state.file_code.name:
                     with open(st.session_state.file_code.name, "r") as f:
-                        with st.expander(f"🔎 View {selected_lang} code file content as per standards"):
-                            content=f.read()
-                            st.code(content,selected_lang)
+                        with st.expander(f"🔎 View {selected_lang} code suggestions file content as per standards"):
+                            content=response.json()
+                            st.code(content)
 
 
-        # files = {"file": image.getvalue()} #file details
-        # res = requests.post(f"http://localhost:8080/{codematurity}", files=files)
-        # img_path = res.json()
-        # image = Image.open(img_path.get("name"))
-        # st.image(image)        
-        # st.write("Generating code maturity...")
-        
-    except AttributeError:
-        st.warning("Please login to access this page")
+       
+    except Exception as e:
+        st.error(e)
 
 
 if __name__ == "__main__":

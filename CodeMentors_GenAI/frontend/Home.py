@@ -84,17 +84,18 @@ try:
 
 
     # add language box
-    add_languagebox = st.sidebar.selectbox(
-        "Please select the language?",
-        ("SQL", "Python")
-    )
+    if 'code_lang' not in st.session_state:
+        add_languagebox = st.sidebar.selectbox("Please select the language?",("SQL", "Python"),key='lang_box1')
+    else:
+        add_languagebox = st.sidebar.selectbox("Please select the language?",("SQL", "Python"),key='lang_box2')
+    st.session_state.code_lang=add_languagebox
 
     # add document extension box
-    add_documnetextebox = st.sidebar.selectbox(
-        "Please select the coding standard document type?",
-        ("text", "excel","pdf","none")
-    )
-
+    if 'doc_type' not in st.session_state:
+        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","csv","docx"),key='doc_box1')
+    else:
+        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","csv","docx"),key='doc_box2')
+    st.session_state.doc_type=add_documnetextebox
         
     # Add a Code standard file uploader widget
     if 'file_std' not in st.session_state:

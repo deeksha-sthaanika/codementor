@@ -1,5 +1,7 @@
 from PyPDF2 import PdfReader
+import docx2txt
 import pandas as pd
+import time
 
 class Utility:
     @staticmethod
@@ -15,14 +17,25 @@ class Utility:
                 raw_text += content
 
         return raw_text
+    
+    @staticmethod
+    def readDoc(filename):
+        '''
+        :read text from docx and return rawtext
+        '''
+        raw_text = docx2txt.process(filename)
+
+        return raw_text
 
     @staticmethod
     def readTxt(filename):
         '''
         :read text from txt format and return raw text
         '''
-        with open(filename, 'r') as file:
-            raw_text = file.read()
+        raw_text=filename.read()
+        
+        # with open(filename, 'r') as file:
+        #     raw_text = file.read()
             
         return raw_text
     
@@ -40,7 +53,8 @@ class Utility:
         '''
         :read text from txt format and return raw text in paragraph
         '''
-        df = pd.read_csv(filename)
+        df = pd.read_csv(filename,warn_bad_lines=True)
+        print(df)
         raw_text = '. '.join(list(df['standard']))
         return raw_text
     
