@@ -7,12 +7,12 @@ import requests
 from fastapi import FastAPI, File, UploadFile
 import os
 import io
-import PyPDF2
+from utilities import Utility as fn
 
 
 
 
-st.markdown("<h1 style='text-align: center; color: black;padding: 1% 1% 1% 1%;background-color: #a2d5f2;'>Code Maturity</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black;padding: 1% 1% 1% 1%;background-color: #a2d5f2;'>Correct Code Generation</h1>", unsafe_allow_html=True)
 style="""
 .css-184tjsw p{
 font-weight:bold
@@ -126,64 +126,51 @@ font-weight:bold
 st.markdown(f"<style>{style_table}</style>",unsafe_allow_html=True)
 
 # Streamlit interface
-def save_uploadedfile(uploadedfile):
-    with open(os.path.join(uploadedfile.name),"wb") as f:
-        f.write(uploadedfile.getbuffer())
-
 def main():
 
     try:
         selected_lang=st.session_state.code_lang
         selected_doc_type=st.session_state.doc_type
+        if st.session_state.file_std and st.session_state.file_code:
+            col3,col4 = st.columns(2)
 
-        save_uploadedfile(st.session_state.file_std)
-        save_uploadedfile(st.session_state.file_code)
-
-        col3,col4 = st.columns(2)
-
-        with col3:
-            if st.session_state.file_std.name:
-                # with open(st.session_state.file_std.name, "r") as f:
+            with col3:
                 with st.expander(f"🔎 View standard file content ({selected_doc_type})"):
-                #         content=f.read()
-                #         st.code(content)
-                    st.code(st.session_state.file_std.getvalue())
-                    # st.write(PyPDF2.PdfFileReader(io.BytesIO(st.session_state.file_std)))
-            else:
-                st.write('👈 Please choose  **uploaded_standard_file**!')
+                    file_std1=io.BytesIO(st.session_state.file_std.read())
+                    if selected_doc_type=='text':
+                        contents_std=st.session_state.file_std.getvalue()
+                    elif selected_doc_type=='pdf':
+                        contents_std=fn.readPdf(file_std1)
+                    elif selected_doc_type=='docx':
+                        contents_std=fn.readDoc(file_std1)
+                    elif selected_doc_type=='csv':
+                        contents_std=fn.readCsv(file_std1)
+                    elif selected_doc_type=='excel':
+                        contents_std=fn.readExcel(file_std1)
+                    st.code(contents_std)
 
-        with col4:
-            if st.session_state.file_code.name:
-                # with open(st.session_state.file_code.name, "r") as f:
+            with col4:
                 with st.expander(f"🔎 View {selected_lang} code file content"):
-                        # content=f.read()
-                        # st.code(content,selected_lang)
                     st.code(st.session_state.file_code.getvalue(),selected_lang)
-            else:
-                st.write('👈 Please choose  **uploaded_code_file**!')
-
-        files = {
-                 'file_std': st.session_state.file_std,
-                 'file_code': st.session_state.file_code
-                 }
-
-        data = {'lang':selected_lang ,'type':selected_doc_type}
-
-        if st.button("Process Files"):
-            st.write(files)
-            st.write(data)
-            response = requests.post("http://127.0.0.1:8000/Code_Maturity/", files=files,data=data)
-            st.write(response.json())
-            
-            if response.status_code==200:
-                st.title("Suggested Changes")
-                if st.session_state.file_code.name:
-                    with open(st.session_state.file_code.name, "r") as f:
-                        with st.expander(f"🔎 View {selected_lang} code suggestions file content as per standards"):
-                            content=response.json()
-                            st.code(content)
 
 
+            files = {
+                    'file_std': st.session_state.file_std,
+                    'file_code': st.session_state.file_code
+                    }
+
+            data = {'lang':selected_lang ,'type':selected_doc_type}
+
+            if st.button("Format Code as per Standards"):
+                response = requests.post("http://127.0.0.1:8000/Format_Code/", files=files,data=data)
+                # st.write(response.content)
+                if response.status_code==200:
+                    with st.expander(f"🔎 View {selected_lang} file content as per standards"):
+                        content=response.json()
+                        st.code(content["result"]["completition"],selected_lang)
+
+        else:
+            st.info('👈 Please Upload files in home page to continue')
        
     except Exception as e:
         st.error(e)

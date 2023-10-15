@@ -4,12 +4,11 @@ from typing import Any, Dict
 from PIL import Image
 import os
 import requests
-from fastapi import FastAPI, File, UploadFile
 
 image = Image.open('.//codementor.jpg')
 st.image(image)
 
-st.markdown("<h1 style='text-align: center;color: #098BCB;'>Welcome to Code mentor", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;color: #098BCB;'>Welcome To Code Mentor", unsafe_allow_html=True)
 style="""
 .css-184tjsw p{
 font-weight:bold
@@ -68,19 +67,18 @@ div.stButton > button:active {
 
 
 try:
-    
-    st.sidebar.info("Choose a page!")
+
     st.markdown(
         """
-    This app provides insights on a demo Code Best Practices.
+    This app helps you format the code as per you defnined organizational standards.
+
+    Further formatted code can be Optimized to reduce tiem complexity
 
     ### Get started!
 
     👈 Provide the details and then Select a page in the sidebar!
         """
     )
-
-    st.sidebar.write('<p class="sidebar-title">CODE MENTOR</p>', unsafe_allow_html=True)
 
 
     # add language box
