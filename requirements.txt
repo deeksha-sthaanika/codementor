@@ -3,3 +3,6 @@ langchain
 openai
 fastapi
 uvicorn
+multi-part
+PyPDF2
+docxtotxt

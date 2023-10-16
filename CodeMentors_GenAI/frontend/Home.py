@@ -4,12 +4,11 @@ from typing import Any, Dict
 from PIL import Image
 import os
 import requests
-from fastapi import FastAPI, File, UploadFile
 
 image = Image.open('.//codementor.jpg')
 st.image(image)
 
-st.markdown("<h1 style='text-align: center;color: #098BCB;'>Welcome to Code mentor", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;color: #098BCB;'>Welcome To Code Mentor", unsafe_allow_html=True)
 style="""
 .css-184tjsw p{
 font-weight:bold
@@ -68,11 +67,12 @@ div.stButton > button:active {
 
 
 try:
-    
-    st.sidebar.info("Choose a page!")
+
     st.markdown(
         """
-    This app provides insights on a demo Code Best Practices.
+    This app helps you format the code as per you defnined organizational standards.
+
+    Further formatted code can be Optimized to reduce tiem complexity
 
     ### Get started!
 
@@ -80,21 +80,20 @@ try:
         """
     )
 
-    st.sidebar.write('<p class="sidebar-title">CODE MENTOR</p>', unsafe_allow_html=True)
-
 
     # add language box
-    add_languagebox = st.sidebar.selectbox(
-        "Please select the language?",
-        ("SQL", "Python")
-    )
+    if 'code_lang' not in st.session_state:
+        add_languagebox = st.sidebar.selectbox("Please select the language?",("SQL", "Python"),key='lang_box1')
+    else:
+        add_languagebox = st.sidebar.selectbox("Please select the language?",("SQL", "Python"),key='lang_box2')
+    st.session_state.code_lang=add_languagebox
 
     # add document extension box
-    add_documnetextebox = st.sidebar.selectbox(
-        "Please select the coding standard document type?",
-        ("text", "excel","pdf","none")
-    )
-
+    if 'doc_type' not in st.session_state:
+        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","csv","docx"),key='doc_box1')
+    else:
+        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","csv","docx"),key='doc_box2')
+    st.session_state.doc_type=add_documnetextebox
         
     # Add a Code standard file uploader widget
     if 'file_std' not in st.session_state:
