@@ -151,9 +151,21 @@ def main():
                 response = requests.post("http://127.0.0.1:8000/Optimize_Code/", files=files,data=data)
                 # st.write(response.content)
                 if response.status_code==200:
-                    with st.expander(f"🔎 View optimized {selected_lang} file content"):
+                    try:
+                        with st.expander(f"🔎 View optimized {selected_lang} file content"):
+                            content=response.json()
+                            st.code(content["result"]["completition"],selected_lang)
+                            st.download_button(
+                                label="Download Code",
+                                data=content["result"]["completition"],
+                                file_name='Formatted_Code_'+st.session_state.file_code.name,
+                                mime='text/csv',
+                            )
+                    except:
                         content=response.json()
-                        st.code(content["result"]["completition"],selected_lang)
+                        st.error(str(content["result"]["response_code"])+': '+content["result"]["message"]["_message"])
+                else:
+                    st.error("Couldn't fetch the result. Please try again")
 
         else:
             st.info('👈 Please Upload files in home page to continue')
