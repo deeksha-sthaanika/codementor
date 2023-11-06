@@ -57,5 +57,26 @@ async def create_upload_file(lang: str = Form(...),type: str = Form(...),file_st
   
     return {"prompt":ready_prompt,"result":completition}
 
+@app.post("/Code_Maturity/")#lang: str,type: str,
+async def create_upload_file(lang: str = Form(...),type: str = Form(...),file_std: UploadFile = File(...),file_code: UploadFile = File(...)):#files: UploadFile = File(...)
+    contents_code=await file_code.read()
+    file_std1=io.BytesIO(await file_std.read())
+
+    if type=='text':
+        contents_std=fn.readTxt(file_std1)
+    elif type=='pdf':
+        contents_std=fn.readPdf(file_std1)
+    elif type=='docx':
+        contents_std=fn.readDoc(file_std1)
+    elif type=='csv':
+        contents_std=fn.readCsv(file_std1)
+    elif type=='excel':
+        contents_std=fn.readExcel(file_std1)
+    
+    ready_prompt = prompt.suggestChange(lang, contents_std, contents_code)
+    completition = getResponseLlm(ready_prompt)
+  
+    return {"prompt":ready_prompt,"result":completition}
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8080)
