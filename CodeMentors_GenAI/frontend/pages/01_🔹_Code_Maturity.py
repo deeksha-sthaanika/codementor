@@ -12,7 +12,7 @@ from utilities import Utility as fn
 
 
 
-st.markdown("<h1 style='text-align: center; color: black;padding: 1% 1% 1% 1%;background-color: #a2d5f2;'>Correct Code Generation</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: black;padding: 1% 1% 1% 1%;background-color: #a2d5f2;'>Code Maturity</h1>", unsafe_allow_html=True)
 style="""
 .css-184tjsw p{
 font-weight:bold
@@ -169,7 +169,6 @@ def main():
                         with st.expander(f"🔎 View {selected_lang} file content as per standards"):
                             content=response.json()
                             st.code(content["result"]["completition"],selected_lang)
-                            
                             st.download_button(
                                 label="Download Code",
                                 data=content["result"]["completition"],
