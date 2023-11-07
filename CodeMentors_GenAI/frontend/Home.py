@@ -90,9 +90,9 @@ try:
 
     # add document extension box
     if 'doc_type' not in st.session_state:
-        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","csv","docx"),key='doc_box1')
+        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","docx"),key='doc_box1')
     else:
-        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","csv","docx"),key='doc_box2')
+        add_documnetextebox = st.sidebar.selectbox("Please select the coding standard document type?",("text", "excel","pdf","docx"),key='doc_box2')
     st.session_state.doc_type=add_documnetextebox
         
     # Add a Code standard file uploader widget
@@ -109,6 +109,8 @@ try:
         uploaded_file = st.sidebar.file_uploader("Upload the respective code file :page_facing_up:",key='file_code_key')
     st.session_state.file_code=uploaded_file
   
-    
+    st.write(st.session_state.file_std)
+    st.write(st.session_state.file_code)
+
 except Exception as e:
     st.error(e) 

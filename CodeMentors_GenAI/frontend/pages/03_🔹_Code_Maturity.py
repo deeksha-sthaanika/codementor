@@ -136,7 +136,8 @@ def main():
 
             with col3:
                 with st.expander(f"🔎 View standard file content ({selected_doc_type})"):
-                    file_std1=io.BytesIO(st.session_state.file_std.read())
+                    # file_std1=io.BytesIO(st.session_state.file_std.read())
+                    file_std1=st.session_state.file_std
                     if selected_doc_type=='text':
                         contents_std=st.session_state.file_std.getvalue()
                     elif selected_doc_type=='pdf':

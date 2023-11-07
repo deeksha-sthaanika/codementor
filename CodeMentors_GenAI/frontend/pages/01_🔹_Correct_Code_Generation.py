@@ -5,6 +5,7 @@ import streamlit as st
 import Home as hm
 import requests
 from fastapi import FastAPI, File, UploadFile
+from PyPDF2 import PdfReader
 import os
 import io
 from utilities import Utility as fn
@@ -136,7 +137,12 @@ def main():
 
             with col3:
                 with st.expander(f"🔎 View standard file content ({selected_doc_type})"):
-                    file_std1=io.BytesIO(st.session_state.file_std.read())
+                    # file_std1=io.BytesIO(st.session_state.file_std.getvalue())
+                    file_std1=st.session_state.file_std
+                    # st.write(file_std1)
+                    # pdfreader = PdfReader(file_std1)
+                    # contents_std=pdfreader
+                    # st.write(pdfreader)
                     if selected_doc_type=='text':
                         contents_std=st.session_state.file_std.getvalue()
                     elif selected_doc_type=='pdf':
@@ -151,18 +157,21 @@ def main():
 
             with col4:
                 with st.expander(f"🔎 View {selected_lang} code file content"):
-                    st.code(st.session_state.file_code.getvalue(),selected_lang)
+                    contents_code=st.session_state.file_code.getvalue()
+                    st.code(contents_code,selected_lang)
 
 
-            files = {
-                    'file_std': st.session_state.file_std,
-                    'file_code': st.session_state.file_code
-                    }
+            # files = {
+            #         # 'file_std': st.session_state.file_std,
+            #         'file_code': st.session_state.file_code
+            #         }
 
-            data = {'lang':selected_lang ,'type':selected_doc_type}
-
+            data = {'lang':selected_lang ,'type':selected_doc_type,'file_std':contents_std,'file_code':contents_code}
+            # st.write(data)
+            st.write(st.session_state.file_code)
             if st.button("Format Code as per Standards"):
-                response = requests.post("http://127.0.0.1:8000/Format_Code/", files=files,data=data)
+                # st.write('something')
+                response = requests.post("http://127.0.0.1:8000/Format_Code/",data=data)
                 # st.write(response.content)
                 if response.status_code==200:
                     try:

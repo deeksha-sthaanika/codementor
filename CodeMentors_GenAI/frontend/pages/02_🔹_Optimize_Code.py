@@ -137,18 +137,19 @@ def main():
         
         if st.session_state.file_std and st.session_state.file_code:
             with st.expander(f"🔎 View {selected_lang} code file content before Optimization"):
-                st.code(st.session_state.file_code.getvalue(),selected_lang)
+                contents_code=st.session_state.file_code.getvalue()
+                st.code(contents_code,selected_lang)
 
-            files = {
-                    'file_std': st.session_state.file_std,
-                    'file_code': st.session_state.file_code
-                    }
+            # files = {
+            #         'file_std': st.session_state.file_std,
+            #         'file_code': st.session_state.file_code
+            #         }
 
-            data = {'lang':selected_lang ,'type':selected_doc_type}
+            data = {'lang':selected_lang ,'type':selected_doc_type,'file_code':contents_code}
 
             if st.button("Optimize Code"):
 
-                response = requests.post("http://127.0.0.1:8000/Optimize_Code/", files=files,data=data)
+                response = requests.post("http://127.0.0.1:8000/Optimize_Code/",data=data)
                 # st.write(response.content)
                 if response.status_code==200:
                     try:
