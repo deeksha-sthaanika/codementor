@@ -162,7 +162,7 @@ def main():
             data = {'lang':selected_lang ,'type':selected_doc_type}
 
             if st.button("Format Code as per Standards"):
-                response = requests.post("http://127.0.0.1:8000/Format_Code/", files=files,data=data)
+                response = requests.post("http://127.0.0.1:8000/Code_Maturity/", files=files,data=data)
                 # st.write(response.content)
                 if response.status_code==200:
                     try:
